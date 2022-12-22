@@ -1,0 +1,47 @@
+---
+- name: Create EC2 Instance
+  hosts: localhost
+  # become: true
+  become_method: sudo
+  connection: local
+  gather_facts: false
+  vars:
+    ansible_ssh_private_key_file: /home/misaki/Ansible/myboomi.cer
+    ansible_python_interpreter: /usr/bin/python3
+  vars_files:
+    - ./playbooks/my_keys.yaml
+
+  tasks:
+  - name: Create a security group
+    ec2_group:
+      name: my-security-group
+      description: Security group for my application
+      vpc_id: vpc-0a163ed0bdd23126e
+      region: eu-west-1
+      aws_access_key: "{{ aws_access_key }}"
+      aws_secret_key: "{{ aws_secret_key }}"
+      rules:
+        - proto: tcp
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          from_port: 443
+          to_port: 443
+          cidr_ip: 0.0.0.0/0
+    register: security_group
+  - name: Create an EC2 instance
+    ec2:
+      key_name: myboomi
+      instance_type: t2.micro
+      image: ami-00463ddd1036a8eb6
+      wait: true
+      region: eu-west-1
+      count: 1
+      group: my-security-group
+      aws_access_key: "{{ aws_access_key }}"
+      aws_secret_key: "{{ aws_secret_key }}"
+      instance_tags:
+        Name: MyUwU
+
+

@@ -1,0 +1,46 @@
+---
+- name: Config my Cloud
+  hosts: myseef
+  become: true
+  become_method: sudo
+  vars:
+    ansible_ssh_private_key_file: /home/misaki/Ansible/myboomi.cer
+
+  tasks:
+  - name: install docker & docker for python
+    apt:
+      name: docker.io,python3-docker,docker-compose
+      state: present
+      update_cache: yes
+      cache_valid_time: 3600
+  - name: start docker
+    systemd:
+      name: docker
+      state: started
+      enabled: yes
+  - name: Add ubuntu to the docker group
+    shell: usermod -aG docker ubuntu
+  # - name: Rebooting the cloud server/bare metal box
+  #   reboot:
+  #     test_command: uptime
+  - name: Install Vim
+    apt:
+      name: vim
+      state: present
+      update_cache: yes
+  - name: Create Directory
+    file:
+      path: /tmp/build
+      state: directory
+  - name: Copy my App
+    copy:
+      src: ../app/
+      dest: /tmp/build
+  - name: Run container
+    become: True
+    shell:
+      cmd: "docker-compose -f /tmp/build/docker-compose.yaml up --build -d"
+      # /usr/bin/docker-compose
+      chdir: /tmp/build/
+
+# sudo ansible-playbook create_ec2.yaml
