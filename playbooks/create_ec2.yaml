@@ -8,16 +8,22 @@
   vars:
     ansible_ssh_private_key_file: /home/misaki/Ansible/myboomi.cer
     ansible_python_interpreter: /usr/bin/python3
+    region: eu-west-1
+    group: my-security-group
+    key_name: myboomi
+    instance_type: t2.micro
+    image: ami-00463ddd1036a8eb6
+
   vars_files:
-    - ./playbooks/my_keys.yaml
+    - my_keys.yaml
 
   tasks:
   - name: Create a security group
     ec2_group:
-      name: my-security-group
+      name: "{{ group }}"
       description: Security group for my application
       vpc_id: vpc-0a163ed0bdd23126e
-      region: eu-west-1
+      region: "{{ region }}"
       aws_access_key: "{{ aws_access_key }}"
       aws_secret_key: "{{ aws_secret_key }}"
       rules:
@@ -32,16 +38,16 @@
     register: security_group
   - name: Create an EC2 instance
     ec2:
-      key_name: myboomi
-      instance_type: t2.micro
-      image: ami-00463ddd1036a8eb6
+      key_name: "{{ key_name }}"
+      instance_type: "{{ instance_type }}"
+      image: "{{ image }}"
       wait: true
-      region: eu-west-1
+      region: "{{ region }}"
       count: 1
-      group: my-security-group
+      group: "{{ group }}"
       aws_access_key: "{{ aws_access_key }}"
       aws_secret_key: "{{ aws_secret_key }}"
       instance_tags:
         Name: MyUwU
 
-
+# sudo ansible-playbook create_ec2.yaml
