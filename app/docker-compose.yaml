@@ -55,15 +55,15 @@ services:
     networks:
       - mynetwork
   
-  website:
-    build: ./requirements/bonus/website/
-    image: website
-    container_name: website
-    ports:
-      - 1337:1337
-    restart: always
-    networks:
-      - mynetwork
+  # website:
+  #   build: ./requirements/bonus/website/
+  #   image: website
+  #   container_name: website
+  #   ports:
+  #     - 1337:1337
+  #   restart: always
+  #   networks:
+  #     - mynetwork
 
   # adminer:
   #   build: ./requirements/bonus/adminer/
@@ -130,17 +130,17 @@ services:
 
 volumes:
   mariadb_data:
-    # name: mariadb_data
-  #   driver_opts:
-  #     type: none
-  #     o: bind
-  #     device: /home/mmounchi/data/mariadb_data
+    name: mariadb_data
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/ubuntu/data/mariadb_data
   wordpress_nginx:
-    # name: wordpress_nginx
-  #   driver_opts:
-  #     type: none
-  #     o: bind
-  #     device: /home/mmounchi/data/wordpress_nginx
+    name: wordpress_nginx
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/ubuntu/data/wordpress_nginx
 
 networks:
   mynetwork:

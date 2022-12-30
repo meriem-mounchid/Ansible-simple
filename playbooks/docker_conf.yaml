@@ -1,6 +1,6 @@
 ---
 - name: Config my Cloud
-  hosts: myseef
+  hosts: tag_Name_MyCloud_2
   become: true
   become_method: sudo
   vars:
@@ -43,4 +43,4 @@
       # /usr/bin/docker-compose
       chdir: /tmp/build/
 
-# sudo ansible-playbook create_ec2.yaml
+# sudo ansible-playbook docker_conf.yaml 

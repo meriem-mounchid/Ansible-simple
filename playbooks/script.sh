@@ -5,10 +5,11 @@
 # sudo ansible-playbook docker_conf.yaml
 # https://3.253.80.56
 
-sudo ansible-playbook create_ec2.yaml 
 echo "[localhost]" >> /etc/ansible/hosts
 echo "local" >> /etc/ansible/hosts
 
+sudo ansible-playbook create_ec2.yaml 
+# ansible-inventory -i /home/misaki/Ansible/playbooks/aws_ec2.yaml --graph
 
 sudo sed -i "11i inventory      = /home/misaki/Ansible/playbooks/aws_ec2.yaml" /etc/ansible/ansible.cfg
 sudo sed -i "12i remote_user    = ubuntu" /etc/ansible/ansible.cfg

@@ -1,7 +1,6 @@
 ---
 - name: Create EC2 Instance
   hosts: localhost
-  # become: true
   become_method: sudo
   connection: local
   gather_facts: false
@@ -15,14 +14,23 @@
     image: ami-00463ddd1036a8eb6
 
   vars_files:
-    - my_keys.yaml
+    - vault.yml
 
   tasks:
+  - name: Create a vpc
+    ec2_vpc_net:
+      region: "{{ region }}"
+      name: vpc2
+      aws_access_key: "{{ aws_access_key }}"
+      aws_secret_key: "{{ aws_secret_key }}"
+      cidr_block: 10.10.0.0/16
+    register: vpc_info
+      
   - name: Create a security group
     ec2_group:
-      name: "{{ group }}"
+      name: my-security-group
       description: Security group for my application
-      vpc_id: vpc-0a163ed0bdd23126e
+      vpc_id: "{{ vpc_info.vpc.id }}"
       region: "{{ region }}"
       aws_access_key: "{{ aws_access_key }}"
       aws_secret_key: "{{ aws_secret_key }}"
@@ -36,6 +44,26 @@
           to_port: 443
           cidr_ip: 0.0.0.0/0
     register: security_group
+
+  - name: Create public subnet 
+    ec2_vpc_subnet:
+      state: present
+      region: "{{ region }}"
+      vpc_id: "{{ vpc_info.vpc.id }}"
+      cidr: 10.10.1.0/24
+      map_public: true
+      aws_access_key: "{{ aws_access_key }}"
+      aws_secret_key: "{{ aws_secret_key }}"
+    register: vpc_subnet
+
+  - name: Check if the instance exists
+    ec2_instance_info:
+      filters:
+        tag:Name: MyCloud-2
+      aws_access_key: "{{ aws_access_key }}"
+      aws_secret_key: "{{ aws_secret_key }}"
+    register: instance_info
+
   - name: Create an EC2 instance
     ec2:
       key_name: "{{ key_name }}"
@@ -44,10 +72,14 @@
       wait: true
       region: "{{ region }}"
       count: 1
-      group: "{{ group }}"
+      state: present
+      group_id: "{{ security_group.group_id }}"
+      vpc_subnet_id: "{{ vpc_subnet.subnet.id }}"
+      instance_tags:
+        Name: MyCloud-2
       aws_access_key: "{{ aws_access_key }}"
       aws_secret_key: "{{ aws_secret_key }}"
-      instance_tags:
-        Name: MyUwU
+    register: ec2
+    when: instance_info.instances == []
 
-# sudo ansible-playbook create_ec2.yaml
+# sudo ansible-playbook create_ec2.yaml --ask-vault-pass
