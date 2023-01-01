@@ -1,8 +1,8 @@
 ---
 - name: Create EC2 Instance
   hosts: localhost
-  become_method: sudo
-  connection: local
+  # become_method: sudo
+  # connection: local
   gather_facts: false
   vars:
     ansible_ssh_private_key_file: /home/misaki/Ansible/myboomi.cer
@@ -12,25 +12,30 @@
     key_name: myboomi
     instance_type: t2.micro
     image: ami-00463ddd1036a8eb6
-
+    vpc_id: vpc-0a163ed0bdd23126e
+    name: MyCloud-6
   vars_files:
     - vault.yml
 
   tasks:
-  - name: Create a vpc
-    ec2_vpc_net:
+  - name: Create public subnet 
+    ec2_vpc_subnet:
+      state: present
       region: "{{ region }}"
-      name: vpc2
+      # vpc_id: "{{ vpc_info.vpc.id }}"
+      vpc_id: "{{ vpc_id }}"
+      cidr: 172.31.128.0/18
+      map_public: true
       aws_access_key: "{{ aws_access_key }}"
       aws_secret_key: "{{ aws_secret_key }}"
-      cidr_block: 10.10.0.0/16
-    register: vpc_info
-      
+    register: vpc_subnet
+
   - name: Create a security group
     ec2_group:
       name: my-security-group
       description: Security group for my application
-      vpc_id: "{{ vpc_info.vpc.id }}"
+      # vpc_id: "{{ vpc_info.vpc.id }}"
+      vpc_id: "{{ vpc_id }}"
       region: "{{ region }}"
       aws_access_key: "{{ aws_access_key }}"
       aws_secret_key: "{{ aws_secret_key }}"
@@ -43,23 +48,20 @@
           from_port: 443
           to_port: 443
           cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          from_port: 80
+          to_port: 80
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          from_port: 8080
+          to_port: 8080
+          cidr_ip: 0.0.0.0/0
     register: security_group
-
-  - name: Create public subnet 
-    ec2_vpc_subnet:
-      state: present
-      region: "{{ region }}"
-      vpc_id: "{{ vpc_info.vpc.id }}"
-      cidr: 10.10.1.0/24
-      map_public: true
-      aws_access_key: "{{ aws_access_key }}"
-      aws_secret_key: "{{ aws_secret_key }}"
-    register: vpc_subnet
 
   - name: Check if the instance exists
     ec2_instance_info:
       filters:
-        tag:Name: MyCloud-2
+        tag:Name: "{{ name }}"
       aws_access_key: "{{ aws_access_key }}"
       aws_secret_key: "{{ aws_secret_key }}"
     register: instance_info
@@ -71,15 +73,17 @@
       image: "{{ image }}"
       wait: true
       region: "{{ region }}"
-      count: 1
+      count: 2
       state: present
+      # group: "{{ group }}"
       group_id: "{{ security_group.group_id }}"
       vpc_subnet_id: "{{ vpc_subnet.subnet.id }}"
-      instance_tags:
-        Name: MyCloud-2
+      # classic: true
       aws_access_key: "{{ aws_access_key }}"
       aws_secret_key: "{{ aws_secret_key }}"
+      instance_tags:
+        Name: "{{ name }}"
     register: ec2
     when: instance_info.instances == []
-
+  
 # sudo ansible-playbook create_ec2.yaml --ask-vault-pass

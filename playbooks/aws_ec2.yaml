@@ -1,7 +1,9 @@
 ---
 plugin: aws_ec2
-aws_access_key: ***
-aws_secret_key: ***
+aws_access_key: ****
+aws_secret_key: ****
+# vars_files:
+#   - vault.yml
 
 keyed_groups:
   - key: tags

@@ -17,3 +17,10 @@ sudo sed -i "331i enable_plugins = aws_ec2" /etc/ansible/ansible.cfg
 sudo chmod 777 /home/misaki/.ansible/cp
 
 sudo ansible-playbook docker_conf.yaml
+
+
+# find / -type f -name "ssh_config" 2>/dev/null
+# sudo  vim /etc/ssh/ssh_config
+# echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+# eval "$(ssh-agent -s)"
+# 

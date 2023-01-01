@@ -20,9 +20,11 @@ sed -i "s/localhost/$WORDPRESS_DB_HOST/" /var/www/html/wordpress/wp-config.php
 sed -i "85i define('WP_REDIS_PORT', 6379);" /var/www/html/wordpress/wp-config.php
 sed -i "86i define('WP_REDIS_HOST', 'redis');" /var/www/html/wordpress/wp-config.php
 
-wp core install --title="Inception" --admin_user=$WORDPRESS_ROOT_USER --admin_password=$WORDPRESS_ROOT_PASSWORD --admin_email="mmounchi@student.1337.ma" --allow-root
+wp core install --title="Inception" --url="http://34.243.227.210" --admin_user=$WORDPRESS_ROOT_USER --admin_password=$WORDPRESS_ROOT_PASSWORD --admin_email="mmounchi@student.1337.ma" --allow-root
 wp user create $WORDPRESS_USER "misaki@gmail.com" --user_pass=$WORDPRESS_PASSWORD --role=author --allow-root
-
+# --url="http://mmounchi.42.fr"
+# wp option update siteurl http://mmounchi.42.fr
+# wp option update home http://mmounchi.42.fr
 wp plugin install redis-cache --activate --allow-root
 wp redis enable --force --allow-root
 

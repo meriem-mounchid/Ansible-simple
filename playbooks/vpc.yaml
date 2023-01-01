@@ -1,0 +1,38 @@
+---
+- name: Get VPC info
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    ansible_ssh_private_key_file: /home/misaki/Ansible/myboomi.cer
+  tasks:
+  - name: Get VPC info
+    ec2_vpc_info:
+      region: us-east-1
+      filters:
+        - "isDefault=true"
+    register: vpc_info
+  - debug:
+      var: vpc_info
+
+
+    # - name: Get VPC info
+  #   ec2_vpc_info:
+  #     region: "{{ region }}"
+  #     filters:
+  #       - "isDefault=true"
+  #   register: vpc_info
+  # - debug:
+  #     var: vpc_info
+  # - name: Get default VPC information
+  #   ec2_vpc_info:
+  #     region: "{{ region }}"
+  #     filters:
+  #       is_default: true
+  #     aws_access_key: "{{ aws_access_key }}"
+  #     aws_secret_key: "{{ aws_secret_key }}"
+  #   register: vpc_info
+  # - set_fact:
+  #     default_vpc: "{{ vpc_info.vpcs | first }}"
+  # - debug:
+  #     var: vpc_info

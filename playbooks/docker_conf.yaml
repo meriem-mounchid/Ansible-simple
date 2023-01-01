@@ -1,6 +1,6 @@
 ---
 - name: Config my Cloud
-  hosts: tag_Name_MyCloud_2
+  hosts: tag_Name_MyCloud_6
   become: true
   become_method: sudo
   vars:

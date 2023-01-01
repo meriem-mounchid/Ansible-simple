@@ -49,6 +49,7 @@ services:
       - wordpress_nginx:/var/www/html/wordpress
     ports:
       - 443:443
+      - 80:80
     depends_on:
       - wordpress
     restart: always
@@ -65,18 +66,18 @@ services:
   #   networks:
   #     - mynetwork
 
-  # adminer:
-  #   build: ./requirements/bonus/adminer/
-  #   image: adminer
-  #   container_name: adminer
-  #   env_file: .env
-  #   restart: always
-  #   depends_on:
-  #     - mariadb
-  #   ports:
-  #     - 8080:8080
-  #   networks:
-  #     - mynetwork
+  adminer:
+    build: ./requirements/bonus/adminer/
+    image: adminer
+    container_name: adminer
+    env_file: .env
+    restart: always
+    depends_on:
+      - mariadb
+    ports:
+      - 8080:8080
+    networks:
+      - mynetwork
 
   # ftp:
   #   build:
@@ -130,17 +131,17 @@ services:
 
 volumes:
   mariadb_data:
-    name: mariadb_data
-    driver_opts:
-      type: none
-      o: bind
-      device: /home/ubuntu/data/mariadb_data
+    # name: mariadb_data
+    # driver_opts:
+    #   type: none
+    #   o: bind
+    #   device: /home/ubuntu/data/mariadb_data
   wordpress_nginx:
-    name: wordpress_nginx
-    driver_opts:
-      type: none
-      o: bind
-      device: /home/ubuntu/data/wordpress_nginx
+    # name: wordpress_nginx
+    # driver_opts:
+    #   type: none
+    #   o: bind
+    #   device: /home/ubuntu/data/wordpress_nginx
 
 networks:
   mynetwork:
