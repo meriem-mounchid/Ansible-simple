@@ -19,10 +19,19 @@ sed -i "s/password_here/$WORDPRESS_DB_PASSWORD/" /var/www/html/wordpress/wp-conf
 sed -i "s/localhost/$WORDPRESS_DB_HOST/" /var/www/html/wordpress/wp-config.php
 sed -i "85i define('WP_REDIS_PORT', 6379);" /var/www/html/wordpress/wp-config.php
 sed -i "86i define('WP_REDIS_HOST', 'redis');" /var/www/html/wordpress/wp-config.php
-
-wp core install --title="Inception" --url="http://34.243.227.210" --admin_user=$WORDPRESS_ROOT_USER --admin_password=$WORDPRESS_ROOT_PASSWORD --admin_email="mmounchi@student.1337.ma" --allow-root
+echo "************" $IP_WP "*************"
+wp core install --title="Inception" --url="http://$IP_WP" --admin_user=$WORDPRESS_ROOT_USER --admin_password=$WORDPRESS_ROOT_PASSWORD --admin_email="mmounchi@student.1337.ma" --allow-root
 wp user create $WORDPRESS_USER "misaki@gmail.com" --user_pass=$WORDPRESS_PASSWORD --role=author --allow-root
+echo "---------"
+wp post list --format=ids --allow-root
+echo "---------"
+
+
+wp post create --post_title='My Ip Address' --post_content="$IP_WP" --post_type=page --post_status=publish --allow-root
+
+# wp post update 1 --post_title='My Ip Address' --post_content="$IP_WP" --post_type=page --allow-root
 # --url="http://mmounchi.42.fr"
+# --url="http://34.243.227.210"
 # wp option update siteurl http://mmounchi.42.fr
 # wp option update home http://mmounchi.42.fr
 wp plugin install redis-cache --activate --allow-root

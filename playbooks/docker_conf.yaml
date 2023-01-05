@@ -1,10 +1,14 @@
 ---
 - name: Config my Cloud
-  hosts: tag_Name_MyCloud_6
+  hosts: tag_Name_MyCloud
   become: true
   become_method: sudo
   vars:
     ansible_ssh_private_key_file: /home/misaki/Ansible/myboomi.cer
+    ansible_python_interpreter: /usr/bin/python3
+    region: eu-west-1
+  # vars_files:
+  #   - vault.yml
 
   tasks:
   - name: install docker & docker for python
@@ -36,11 +40,18 @@
     copy:
       src: ../app/
       dest: /tmp/build
+  - name: Copy my IP
+    copy:
+      src: /tmp/env/myfile.txt
+      dest: /tmp/build/myfile.txt
+      mode: a
+      backup: yes
+  - shell: cat /tmp/build/myfile.txt >> /tmp/build/.env
   - name: Run container
     become: True
     shell:
       cmd: "docker-compose -f /tmp/build/docker-compose.yaml up --build -d"
-      # /usr/bin/docker-compose
       chdir: /tmp/build/
 
-# sudo ansible-playbook docker_conf.yaml 
+# sudo ansible-playbook docker_conf.yaml
+# --ask-vault-pass

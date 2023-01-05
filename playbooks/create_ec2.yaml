@@ -13,7 +13,7 @@
     instance_type: t2.micro
     image: ami-00463ddd1036a8eb6
     vpc_id: vpc-0a163ed0bdd23126e
-    name: MyCloud-6
+    name: MyCloud
   vars_files:
     - vault.yml
 
@@ -73,7 +73,7 @@
       image: "{{ image }}"
       wait: true
       region: "{{ region }}"
-      count: 2
+      count: 1
       state: present
       # group: "{{ group }}"
       group_id: "{{ security_group.group_id }}"
@@ -83,7 +83,35 @@
       aws_secret_key: "{{ aws_secret_key }}"
       instance_tags:
         Name: "{{ name }}"
-    register: ec2
+    # register: ec2
     when: instance_info.instances == []
-  
+
+  - name: Debug instance info
+    debug:
+      var: instance_info
+  # - name: Get EC2 instance info
+  #   ec2_instance_info:
+  #     region: "{{ region }}"
+  #     aws_access_key: "{{ aws_access_key }}"
+  #     aws_secret_key: "{{ aws_secret_key }}"
+  #   register: instance_info
+  - debug:
+      var: instance_info.instances[1].public_ip_address
+  # - name: Set public IP address
+  #   set_fact:
+  #     public_ip: "{{ instance_info.instances[1].public_ip_address }}"
+  - debug:
+      var: public_ip
+  - name: Create ENV Directory
+    file:
+      path: /tmp/env
+      state: directory
+  - name: Set IP address on file
+    copy:
+      content: "\nIP_WP={{ instance_info.instances[1].public_ip_address }}"
+      dest: /tmp/env/myfile.txt
+  # - copy:
+  #     content: "\nIP_WP2={{ instance_info.instances[1].public_ip_address }}"
+  #     dest: /tmp/env/myfile2.txt
+
 # sudo ansible-playbook create_ec2.yaml --ask-vault-pass

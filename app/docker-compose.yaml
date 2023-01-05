@@ -30,6 +30,7 @@ services:
         - WORDPRESS_ROOT_PASSWORD=$WORDPRESS_ROOT_PASSWORD
         - WORDPRESS_USER=$WORDPRESS_USER
         - WORDPRESS_PASSWORD=$WORDPRESS_PASSWORD
+        - IP_WP=$IP_WP
     image: wordpress
     container_name: wordpress
     volumes:
